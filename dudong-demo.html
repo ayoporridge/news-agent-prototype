@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>腾讯新闻 · 读懂 Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand: #1677ff;
+      --ink: #111827;
+      --muted: #667085;
+      --soft: #f4f7fb;
+      --line: #e6eaf0;
+      --green: #12b76a;
+      --amber: #f79009;
+      --red: #f04438;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background: #f4f7fb;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    body {
+      min-height: 100%;
+      padding: 0;
+    }
+    .page-top {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      height: 68px;
+      padding: 0 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid rgba(230,234,240,.8);
+    }
+    .page-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -.2px;
+    }
+    .page-logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: url('logo.png') center/contain no-repeat;
+      box-shadow: 0 10px 25px rgba(22,119,255,.22);
+      position: relative;
+    }
+    .page-logo-mark:after {
+      content: none;
+    }
+    .page-logo-sub {
+      color: #98a2b3;
+      font-size: 10px;
+      letter-spacing: 2.2px;
+      margin-top: 2px;
+    }
+    .page-badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #667085;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .stage {
+      max-width: 1360px;
+      min-height: calc(100vh - 68px);
+      margin: 0 auto;
+      padding: 38px 40px 70px;
+      display: grid;
+      grid-template-columns: minmax(300px, 430px) auto minmax(260px, 340px);
+      gap: 46px;
+      align-items: start;
+    }
+    .left-copy {
+      padding-top: 44px;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: #eaf2ff;
+      color: #175cd3;
+      border: 1px solid #d1e5ff;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+    .kicker:before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 0 14px rgba(22,119,255,.8);
+    }
+    .hero-title {
+      margin: 0 0 34px;
+      font-size: 58px;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      font-weight: 900;
+      color: #101828;
+    }
+    .hero-title span {
+      color: transparent;
+      background: linear-gradient(135deg, #1677ff, #00a3ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .hero-sub {
+      margin: 18px 0 30px;
+      color: #667085;
+      line-height: 1.75;
+      font-size: 15px;
+      max-width: 390px;
+    }
+    .feature-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .feature {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(230,234,240,.9);
+      box-shadow: 0 10px 24px rgba(16,24,40,.05);
+    }
+    .feature-icon, .step-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      color: #175cd3;
+      background: linear-gradient(180deg, #fff, #edf5ff);
+      border: 1px solid #d8e9ff;
+    }
+    .feature svg, .step-icon svg, .tool svg {
+      width: 21px;
+      height: 21px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .feature-title {
+      font-weight: 900;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .feature-desc {
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .center-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: sticky;
+      top: 94px;
+    }
+    .phone-frame {
+      width: 414px;
+      height: 888px;
+      padding: 10px;
+      border-radius: 58px;
+      background: #1c1c1e;
+      box-shadow:
+        0 0 0 2px #2c2c2e,
+        0 44px 100px rgba(16,24,40,.32);
+    }
+    .phone-frame-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 48px;
+      overflow: hidden;
+      background: #f6f8fb;
+    }
+    .right-steps {
+      padding-top: 48px;
+    }
+    .step-card {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.86);
+      border-radius: 18px;
+      padding: 13px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(16,24,40,.05);
+      transition: .2s ease;
+    }
+    .step-card:hover {
+      transform: translateX(-4px);
+      border-color: #b2d6ff;
+      box-shadow: 0 14px 32px rgba(22,119,255,.14);
+    }
+    .step-title {
+      font-weight: 900;
+      font-size: 14px;
+      color: #101828;
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background: #f6f8fb;
+      overflow: hidden;
+    }
+    @media (max-width: 1050px) {
+      .page-top { padding: 0 18px; }
+      .stage {
+        grid-template-columns: 1fr;
+        padding: 26px 18px 60px;
+      }
+      .left-copy, .right-steps { padding-top: 0; }
+      .center-wrap { position: static; }
+    }
+    @media (max-width: 520px) {
+      .page-top, .left-copy, .right-steps { display: none; }
+      .stage { display: block; min-height: 100vh; padding: 0; }
+      .phone-frame { width: 100vw; height: 100vh; padding: 0; border-radius: 0; box-shadow: none; }
+      .phone-frame-inner, .phone { width: 100vw; height: 100vh; border-radius: 0; }
+      .center-wrap { display: block; }
+    }
+    .status {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 44px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 14px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+    .status .icons { display: flex; gap: 4px; align-items: center; }
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: #f6f8fb;
+    }
+    .scene.active { display: flex; }
+    .top {
+      padding: 54px 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(246,248,251,.92);
+      backdrop-filter: blur(18px);
+      z-index: 2;
+      border-bottom: 1px solid rgba(230,234,240,.75);
+    }
+    .brand {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: -.2px;
+    }
+    .brand-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: url('logo.png') center/contain no-repeat;
+      position: relative;
+    }
+    .brand-dot:after {
+      content: none;
+    }
+    .search {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: white;
+      color: #475467;
+      display: grid;
+      place-items: center;
+    }
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px 100px;
+    }
+    .feed::-webkit-scrollbar, .reader::-webkit-scrollbar { display: none; }
+    .morning {
+      background: linear-gradient(135deg, #fff, #eef6ff);
+      border: 1px solid #ddeaff;
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .morning-kicker {
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .morning-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #344054;
+    }
+    .news-card {
+      position: relative;
+      min-height: 612px;
+      border-radius: 26px;
+      overflow: hidden;
+      background: #111827;
+      color: white;
+      box-shadow: 0 18px 45px rgba(16,24,40,.18);
+    }
+    .news-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .72;
+    }
+    .news-card:after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.15) 32%, rgba(0,0,0,.82) 100%);
+    }
+    .card-body {
+      position: absolute;
+      inset: auto 0 0;
+      z-index: 1;
+      padding: 20px;
+    }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.16);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+      line-height: 1.12;
+      letter-spacing: -.8px;
+    }
+    .excerpt {
+      font-size: 14px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.9);
+      margin-bottom: 18px;
+    }
+    .open-btn, .primary-btn {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 15px;
+      background: white;
+      color: #101828;
+      font-size: 15px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+    .reader {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 18px 126px;
+      background: white;
+    }
+    .reader h1 {
+      color: #101828;
+      font-size: 28px;
+      line-height: 1.2;
+      margin-top: 8px;
+    }
+    .byline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #667085;
+      font-size: 12px;
+      margin: 12px 0 16px;
+    }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .cover {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+    .article p {
+      font-size: 16px;
+      line-height: 1.9;
+      margin: 0 0 18px;
+      color: #1d2939;
+    }
+    .article h2 {
+      font-size: 20px;
+      margin: 28px 0 12px;
+      letter-spacing: -.2px;
+    }
+    .article-lead {
+      font-size: 17px;
+      line-height: 1.85;
+      color: #344054;
+      padding: 14px 0 2px;
+      border-top: 1px solid var(--line);
+    }
+    .article-media {
+      margin: 18px 0 8px;
+      border-radius: 18px;
+      overflow: visible;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+    .article-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 17px 17px 0 0;
+      background: #fff;
+    }
+    .mock-image {
+      min-height: 190px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .mock-image:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .45;
+    }
+    .mock-image.rank { background: linear-gradient(135deg, #1d4ed8, #0f172a); }
+    .mock-image.social { background: linear-gradient(135deg, #ef4444, #111827); }
+    .mock-image.phone { background: linear-gradient(135deg, #f97316, #1f2937); }
+    .mock-image.idcard { background: linear-gradient(135deg, #475467, #101828); }
+    .mock-inner {
+      position: relative;
+      z-index: 1;
+      width: 88%;
+      border-radius: 18px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.24);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+    }
+    .mock-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .mock-lines {
+      display: grid;
+      gap: 7px;
+      margin-top: 14px;
+    }
+    .mock-lines span {
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.45);
+    }
+    .mock-lines span:nth-child(2) { width: 74%; margin: 0 auto; }
+    .mock-lines span:nth-child(3) { width: 52%; margin: 0 auto; }
+    .caption {
+      padding: 9px 12px 11px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.5;
+      background: #fff;
+    }
+    .quote-box {
+      margin: 18px 0;
+      padding: 14px;
+      border-left: 4px solid var(--brand);
+      background: #f2f7ff;
+      color: #344054;
+      border-radius: 0 14px 14px 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .pdf-pages {
+      display: grid;
+      gap: 12px;
+      margin: 4px 0 18px;
+    }
+    .pdf-page {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(16,24,40,.06);
+    }
+    .pdf-page-note {
+      color: #667085;
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: center;
+      margin: 2px 0 12px;
+    }
+    .source-link-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font-size: 12px;
+      color: #667085;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .source-link-card a {
+      color: var(--brand);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .article-note {
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.65;
+      margin: -4px 0 16px;
+    }
+    .reader-tip {
+      padding: 13px;
+      border-radius: 16px;
+      background: #f2f7ff;
+      color: #175cd3;
+      font-size: 13px;
+      line-height: 1.6;
+      border: 1px solid #d1e5ff;
+      margin: 18px 0;
+    }
+    .tool-dock {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 14px;
+      z-index: 25;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(22px) saturate(150%);
+      border: 1px solid rgba(230,234,240,.9);
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(16,24,40,.18);
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .tool {
+      border: none;
+      background: #f4f7fb;
+      border-radius: 16px;
+      min-height: 62px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      color: #344054;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .tool.active {
+      background: var(--brand);
+      color: white;
+    }
+    .tool-icon { font-size: 20px; line-height: 1; }
+    .tool-icon {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+    }
+    .tool-icon svg {
+      width: 23px;
+      height: 23px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .drawer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      max-height: 78%;
+      transform: translateY(105%);
+      transition: transform .35s cubic-bezier(.2,.8,.2,1);
+      background: white;
+      border-radius: 28px 28px 0 0;
+      box-shadow: 0 -18px 50px rgba(16,24,40,.22);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open { transform: translateY(0); }
+    .drawer-head {
+      padding: 10px 18px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .handle {
+      width: 44px;
+      height: 5px;
+      border-radius: 999px;
+      background: #d0d5dd;
+      margin: 0 auto 12px;
+    }
+    .drawer-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+    }
+    .close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: #f2f4f7;
+      font-size: 20px;
+      color: #667085;
+    }
+    .drawer-body {
+      overflow-y: auto;
+      padding: 16px 18px 28px;
+    }
+    .summary-card, .trust-card, .next-card, .ad-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .summary-card {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      background: #fbfcfe;
+    }
+    .num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eaf2ff;
+      color: var(--brand);
+      font-weight: 900;
+    }
+    .sc-title { font-weight: 800; margin-bottom: 4px; }
+    .sc-text { color: #475467; font-size: 13px; line-height: 1.58; }
+    .map-wrap {
+      background: #0b1220;
+      color: white;
+      border-radius: 22px;
+      padding: 16px;
+      overflow: hidden;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .tl-time {
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .tl-box {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .impact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .impact-card {
+      border-radius: 16px;
+      padding: 12px;
+      background: #f7fbff;
+      border: 1px solid #d8e9ff;
+    }
+    .impact-card strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .impact-card span { font-size: 12px; color: #475467; line-height: 1.45; }
+    .trust-score {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: #ecfdf3;
+      border: 1px solid #abefc6;
+      margin-bottom: 12px;
+    }
+    .score-ring {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: conic-gradient(var(--green) 0 88%, #d1fadf 88% 100%);
+      display: grid;
+      place-items: center;
+      color: #067647;
+      font-weight: 900;
+    }
+    .trust-title { font-weight: 900; color: #067647; }
+    .trust-sub { color: #475467; font-size: 12px; margin-top: 3px; }
+    .source-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .source-row:last-child { border-bottom: 0; }
+    .source-row strong { display: block; margin-bottom: 4px; }
+    .source-row span { color: #667085; line-height: 1.45; }
+    .badge {
+      flex: 0 0 auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: #067647;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .next-card {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .next-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 21px;
+      background: #f2f4f7;
+    }
+    .next-title { font-weight: 900; margin-bottom: 3px; }
+    .next-desc { color: #667085; font-size: 12px; line-height: 1.45; }
+    .ad-card {
+      background: #fffbeb;
+      border-color: #fedf89;
+    }
+    .ad-label {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(247,144,9,.14);
+      color: #b54708;
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .ad-title { font-weight: 900; margin-bottom: 5px; }
+    .ad-desc { color: #664d03; font-size: 12px; line-height: 1.55; }
+    .ad-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .mini-btn {
+      border: 1px solid #fedf89;
+      background: white;
+      color: #92400e;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+    .progress {
+      position: absolute;
+      top: 50px;
+      right: 18px;
+      z-index: 45;
+      font-size: 11px;
+      color: #667085;
+      background: rgba(255,255,255,.8);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      backdrop-filter: blur(14px);
+    }
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 112px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      z-index: 60;
+      background: rgba(16,24,40,.9);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      transition: all .25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header class="page-top">
+    <div class="page-logo">
+      <span class="page-logo-mark"></span>
+      <div>
+        <div>腾讯新闻 · 读懂 Demo</div>
+        <div class="page-logo-sub">READ SMARTER NEWS</div>
+      </div>
+    </div>
+    <div class="page-badge">独立展示页 · 5 步交互旅程</div>
+  </header>
+
+  <div class="stage">
+    <section class="left-copy">
+      <div class="kicker">未来新闻产品原型</div>
+      <h1 class="hero-title">复杂新闻，<br><span>一键读懂。</span></h1>
+      <div class="feature-list">
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h10M5 17h6"/></svg></div>
+          <div><div class="feature-title">长文变短</div><div class="feature-desc">先让用户得到价值，再进入后续信息消费。</div></div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8.2 8.4 10.6 15M15.8 8.4 13.4 15"/></svg></div>
+          <div><div class="feature-title">复杂事画图</div><div class="feature-desc">把事件关系、影响链路和时间线变成可扫读结构。</div></div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.2 7 10 4.1-1.8 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg></div>
+          <div><div class="feature-title">信任可验证</div><div class="feature-desc">来源、争议点、可信等级成为新闻产品的新入口。</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="center-wrap">
+      <div class="phone-frame">
+        <div class="phone-frame-inner">
+          <main class="phone">
+    <div class="status">
+      <span>9:41</span>
+      <span class="icons">5G ▰</span>
+    </div>
+    <div class="progress" id="progress">1 / 5</div>
+
+    <section class="scene active" data-scene="home">
+      <div class="top">
+        <div class="brand"><span class="brand-dot"></span><span>腾讯新闻</span></div>
+        <button class="search">⌕</button>
+      </div>
+      <div class="feed">
+        <div class="morning">
+          <div class="morning-kicker">今日值得读懂</div>
+          <div class="morning-text">复杂新闻会先给你原文，再让你一键变短、画图、验真、继续看。少一点解释成本，多一点读懂速度。</div>
+        </div>
+        <article class="news-card" onclick="switchScene('article')">
+          <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=900&auto=format&fit=crop&q=80" alt="">
+          <div class="card-body">
+            <div class="pill-row">
+              <span class="pill">复杂新闻</span>
+              <span class="pill">科技 × 监管 × 内容生态</span>
+            </div>
+            <h1>实测 GPT-Image-2：“有图有真相”结束了吗？</h1>
+            <div class="excerpt">
+              澎湃新闻实测发现，GPT-Image-2 能复刻社交媒体 UI、生成逼真产品拆解图，甚至暴露身份证篡改等安全隐患。
+            </div>
+            <button class="open-btn">打开这篇 · 试试读懂按钮</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="article">
+      <div class="top">
+        <div class="brand"><span class="brand-dot"></span><span>深度报道</span></div>
+        <button class="search" onclick="switchScene('home')">‹</button>
+      </div>
+      <div class="reader">
+        <h1>实测 GPT-Image-2：“有图有真相”的时代彻底结束了吗？</h1>
+        <div class="byline"><span class="avatar">澎</span><span>澎湃新闻 · 4 月 23 日 · 8 分钟读</span></div>
+        <div class="article">
+          <p class="article-lead">AI生图的王位轮番坐，这次轮到了GPT-Image-2。</p>
+          <p>4月21日，OpenAI发布GPT-Image-2，该模型在Arena评测榜单中综合表现第一。其中在文生图的榜单中，GPT-Image-2取得了1512的高分，大幅领先于排在第二的Nano Banana 2。</p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_01.jpg" alt="Arena榜单截图">
+            <div class="caption">Arena榜单截图</div>
+          </div>
+          <p>与以往的生图模型不同，GPT-Image-2是OpenAI首个具备推理能力的图像模型，可以进行联网搜索和输出自检，知识更新至2025年12月。</p>
+
+          <h2>一、AI能力再进化，但效果逼真 ≠ 内容真实</h2>
+          <p>一些用GPT-Image-2生成的AI假图已经开始在网络上开始传播。比如将在今年9月卸任的苹果CEO Tim Cook加入小米汽车的“假官宣图”，粗看分辨不出AI的痕迹。</p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_02.jpg" alt="Tim Cook加入小米汽车的假官宣图">
+            <div class="caption">Tim Cook加入小米汽车的“假官宣图” · 图片来源：社交网络</div>
+          </div>
+          <p>4月22日，小米集团董事长特别助理、战略部市场部副总经理徐洁云在微博上直斥P图乱搞现象。然而，在他的评论区里依旧有网友在传播同类的高仿图。</p>
+          <p>这是因为GPT-Image-2能够轻松高度还原微博、抖音等社交媒体的UI界面、话题词、IP地点、用户头像等细节信息。</p>
+          <p>从实测来看，GPT-Image-2在生图上的技术跃升体现在几个方面：对于中日韩等非拉丁文字的精准渲染；对字体、字号、图表、UI等设计细节的像素级还原；画面精度大幅提升，分辨率最高支持2K；极强的提示词遵循和风格驾驭能力。</p>
+          <p>以iPhone 17 Pro为例，澎湃新闻对齐Lab仅用83个字的提示词（一张橙色iPhone 17 Pro的完整产品图，从屏幕到电池到主板，每个零件都有引线指向中英文标注（显示屏组件、芯片、电池等），旁边有材质与颜色表格）就一键生成了拆解iPhone的信息图。测试结果显示，它在文字、图片、可视化和排版等效果，已经到了真假难辨的阶段。</p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_03.jpg" alt="GPT-Image-2生成的iPhone 17 Pro拆解信息图">
+            <div class="caption">GPT-Image-2生成的iPhone 17 Pro拆解信息图 · 图片来源：澎湃新闻对齐Lab对GPT-Image-2的测试</div>
+          </div>
+          <p>但画面逼真并不等于内容真实，类似这样的产品拆解信息图，看似有理有据，却经不起核查。<strong>澎湃新闻记者在仔细核对信息后发现，GPT-Image-2生成的信息图存在错误和幻觉，如手机外观颜色将官方的三种颜色加到了六种，将铝金属一体成型机身拆分成若干零件，并把材质写成了钛金属等。</strong></p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_04.jpg" alt="iPhone拆解图错误核查">
+            <div class="caption">iPhone拆解图错误核查 · 图片来源：澎湃新闻对齐Lab对GPT-Image-2的测试</div>
+          </div>
+
+          <h2>二、GPT-Image-2存在严重安全漏洞，可篡改身份证</h2>
+          <p>真假难辨之外，GPT-Image-2在个人信息、版权IP等安全隐私合规上存在不少隐患。<strong>实测中，澎湃新闻记者将个人身份证上传到ChatGPT后，要求把身份证中的人脸换成库克。Image-2不仅改变了人脸，还替换了人名和出生年月日信息，并同步替换了身份证号码中的出生年月日信息。</strong></p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_05.jpg" alt="身份证被篡改示例">
+            <div class="caption">身份证被篡改示例 · 图片来源：澎湃新闻对齐Lab对GPT-Image-2的测试</div>
+          </div>
+          <p><strong>身份证可以被轻易篡改，暴露GPT-Image-2存在明显的安全漏洞和合规隐患。一方面，模型允许用户直接上传身份证等敏感证件作为参考图，很容易造成隐私泄露。另一方面，模型不仅无法识别个人敏感信息，而且也没有阻拦用户进行修改、伪造证件的提示词。不仅如此，模型能够把个人的脸精准替换成敏感人像，也容易滋生人脸伪造、深度合成等诈骗案件的滋生。此外，GPT-Image-2的所有直出图均没有标注“AI生成”的水印或提示，进一步加大了核实和甄别的难度。</strong></p>
+          <div class="article-media">
+            <img src="assets/gpt-image2-md/img_06.jpg" alt="合规隐患示意">
+            <div class="caption">合规隐患示意 · 图片来源：澎湃新闻对齐Lab对GPT-Image-2的测试</div>
+          </div>
+          <p>这并不意味着GPT-Image-2没有设置安全防护围栏。如果以星海城、宫崎骏作为提示词让模型生成图像，会触发“可能违反第三方内容相似性”的防护限制，导致图像无法生成。这说明AI公司有能力在输出、输入端限制IP侵权和侵犯个人隐私的行为。但GPT-Image-2目前在中国公民的个人隐私信息保护上，没有做好基本的保护和有效的侵害防范，很可能引发更多的隐患。</p>
+          <p>可以预见的是，GPT-Image-2发布后，“有图有真相”的时代将彻底结束。当下AI对现实世界的复刻能力已经达到像素级的精度，人类用肉眼甄别真假的难度已然大幅提升，AI图像信任危机将成为不容忽视的社会问题。</p>
+        </div>
+      </div>
+      <nav class="tool-dock">
+        <button class="tool" data-tool="short" onclick="openTool('short')">
+          <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h10M5 17h6"/></svg></span><span>变短</span>
+        </button>
+        <button class="tool" data-tool="map" onclick="openTool('map')">
+          <span class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8.2 8.4 10.6 15M15.8 8.4 13.4 15"/></svg></span><span>画图</span>
+        </button>
+        <button class="tool" data-tool="trust" onclick="openTool('trust')">
+          <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.2 7 10 4.1-1.8 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg></span><span>验真</span>
+        </button>
+        <button class="tool" data-tool="next" onclick="openTool('next')">
+          <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span><span>继续看</span>
+        </button>
+      </nav>
+    </section>
+
+    <aside class="drawer" id="drawer">
+      <div class="drawer-head">
+        <div class="handle"></div>
+        <div class="drawer-title">
+          <span id="drawer-title">变短</span>
+          <button class="close" onclick="closeDrawer()">×</button>
+        </div>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+    </aside>
+
+    <div id="toast" class="toast"></div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right-steps">
+      <button class="step-card" onclick="switchScene('home')">
+        <span class="step-icon"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H5a1 1 0 0 1-1-1v-8.5Z"/></svg></span>
+        <span><span class="step-title">第一屏 · 信息流</span><span class="step-desc">刷到一篇复杂新闻，先给原文和完整语境。</span></span>
+      </button>
+      <button class="step-card" onclick="openTool('short')">
+        <span class="step-icon"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h10M5 17h6"/></svg></span>
+        <span><span class="step-title">第二屏 · 变短</span><span class="step-desc">长文变成 3 个关键点。</span></span>
+      </button>
+      <button class="step-card" onclick="openTool('map')">
+        <span class="step-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8.2 8.4 10.6 15M15.8 8.4 13.4 15"/></svg></span>
+        <span><span class="step-title">第三屏 · 画图</span><span class="step-desc">画出影响链路和时间线。</span></span>
+      </button>
+      <button class="step-card" onclick="openTool('trust')">
+        <span class="step-icon"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.2 7 10 4.1-1.8 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg></span>
+        <span><span class="step-title">第四屏 · 验真</span><span class="step-desc">展示信源链、争议点与可信等级。</span></span>
+      </button>
+      <button class="step-card" onclick="openTool('next')">
+        <span class="step-icon"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        <span><span class="step-title">第五屏 · 继续看</span><span class="step-desc">三个延伸方向，其中一个是清晰标注的相关广告。</span></span>
+      </button>
+    </aside>
+  </div>
+
+  <script src="dudong-demo.js"></script>
+</body>
+</html>
