@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>腾讯新闻 · Agent 版</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles-v3.css?v=8">
+  <link rel="stylesheet" href="styles-v4.css?v=8">
+  <!-- v5 整段把 feed 改成"白色卡片瀑布流"，破坏了 scroll-snap，已禁用 -->
+  <!-- <link rel="stylesheet" href="styles-v5.css"> -->
+  <link rel="stylesheet" href="styles-v5b.css?v=8">
+  <link rel="stylesheet" href="styles-v5c.css?v=8">
+  <link rel="stylesheet" href="styles-v6.css?v=8">
+  <link rel="stylesheet" href="styles-v7.css?v=8">
+  <style>
+    html.embed body { padding: 0 !important; background: transparent !important; align-items: stretch !important; }
+    html.embed .phone-shell { width: 100% !important; height: 100% !important; border-radius: 0 !important; box-shadow: none !important; }
+    html.embed #scene-switcher { display: none !important; }
+  </style>
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.classList.add('embed');
+    }
+  </script>
+</head>
+<body>
+
+<!-- 场景切换器（独立打开时使用）-->
+<div id="scene-switcher">
+  <button data-scene="home" class="scene-btn active">首页</button>
+  <button data-scene="article" class="scene-btn">详情</button>
+  <button data-scene="agent" class="scene-btn">Agent</button>
+  <button data-scene="manga" class="scene-btn">漫画</button>
+  <button data-scene="sandbox" class="scene-btn">沙盘</button>
+  <button data-scene="typhoon" class="scene-btn">台风</button>
+  <button data-scene="debate" class="scene-btn">辩论</button>
+  <button data-scene="graph" class="scene-btn">图谱</button>
+  <button data-scene="factcheck" class="scene-btn">真假</button>
+  <button data-scene="remix" class="scene-btn">读懂</button>
+  <button data-scene="chat" class="scene-btn">追问</button>
+</div>
+
+<div id="phone" class="phone-shell">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4"/><rect x="4" y="5" width="3" height="6"/><rect x="8" y="3" width="3" height="8"/><rect x="12" y="0" width="3" height="11"/></svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2c2 0 3.8.7 5.2 2L15 2.5C13.2.9 10.7 0 8 0S2.8.9 1 2.5L2.8 4C4.2 2.7 6 2 8 2zm0 3c1.2 0 2.3.4 3.1 1.2L12.9 4.6C11.6 3.6 9.8 3 8 3s-3.6.6-4.9 1.6L4.9 6.2C5.7 5.4 6.8 5 8 5zm0 3c.7 0 1.3.2 1.8.7L11 7.3C10.2 6.5 9.1 6 8 6s-2.2.5-3 1.3l1.2 1.4C6.7 8.2 7.3 8 8 8zm-2 3l2 2 2-2" fill="currentColor"/></svg>
+      <svg width="26" height="11" viewBox="0 0 26 11" fill="none"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="19" height="7" rx="1" fill="currentColor"/><rect x="23" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <!-- ============ 场景 1：首页（抖音式沉浸 Feed）============ -->
+  <div class="scene scene-home active" data-scene="home">
+    <!-- 顶部品牌栏（浮在 Feed 上）-->
+    <div class="immersive-home-top">
+      <div class="ih-logo">
+        <div class="brand-dot"></div>
+        <div class="ih-brand">
+          <div class="ih-brand-name">腾讯新闻</div>
+          <div class="ih-brand-slot">早安 · 你关心的先给你</div>
+        </div>
+      </div>
+      <button class="ih-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- 沉浸式 Feed 容器 -->
+    <div class="immersive-feed" id="immersive-feed">
+
+      <!-- Feed 1：image2 新闻（图文，截断阅读原文）-->
+      <div class="ifeed-item ifeed-article" data-feed-index="0">
+        <div class="ifeed-bg">
+          <img src="imgs/feed-gpt-image.png" alt="">
+          <div class="ifeed-bg-gradient"></div>
+        </div>
+
+        <!-- 图文专用：上部内容区（标题+正文预览）-->
+        <div class="ifeed-article-content">
+          <div class="ifeed-chip chip-hot">🔥 你一直在等的</div>
+          <h1 class="ifeed-headline">GPT-image 2 发布 3 小时<br>真能以假乱真</h1>
+          <div class="ifeed-excerpt">
+            <p>2026 年 4 月 24 日凌晨，OpenAI 悄悄上线了 GPT-image 2。官方博客只有三段话，没有发布会，没有 Sam 推特预热——但在之后的三个小时里，这个模型已经让整个内容圈集体失眠。</p>
+            <p>我们用 500 个测试 prompt 跑了一晚上，结论是：<strong>这是第一个能在细节层面骗过人眼的公开模型</strong>。</p>
+            <p>具体强在哪？它做到了跨 20 张图的人物一致性，15 分钟能生成一整套品牌视觉系统（logo、banner、OG 图、favicon 全套），甚至能"编造"逼真的……</p>
+          </div>
+        </div>
+
+        <!-- 渐变截断 + 阅读原文 -->
+        <div class="ifeed-fade-cta" onclick="switchScene('article')">
+          <div class="ifeed-fade-gradient"></div>
+          <button class="ifeed-read-btn">阅读原文 <span>›</span></button>
+        </div>
+
+        <!-- 右侧交互栏 -->
+        <div class="ifeed-right-rail">
+          <div class="irr-item">
+            <div class="irr-avatar"><span>腾</span></div>
+          </div>
+          <div class="irr-item" onclick="iFeedLike(this, event)">
+            <div class="irr-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="irr-count">18.6w</div>
+          </div>
+          <div class="irr-item" onclick="event.stopPropagation(); switchScene('article')">
+            <div class="irr-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            </div>
+            <div class="irr-count">2,156</div>
+          </div>
+          <div class="irr-item" onclick="iFeedBookmark(this, event)">
+            <div class="irr-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+            </div>
+            <div class="irr-count">3.8w</div>
+          </div>
+          <div class="irr-item" onclick="event.stopPropagation(); triggerToast('分享面板')">
+            <div class="irr-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+            </div>
+            <div class="irr-count">9.3k</div>
+          </div>
+        </div>
+
+        <!-- 底部 1/4 处：其他热点资讯小清单（完整可交互）-->
+        <div class="hot-strip" onclick="event.stopPropagation(); triggerToast('🔥 进入热点频道')">
+          <div class="hs-head">
+            <span class="hs-label">🔥 还在关心</span>
+            <span class="hs-more" onclick="event.stopPropagation(); triggerToast('🔥 进入热点频道')">更多 ›</span>
+          </div>
+          <div class="hs-list">
+            <div class="hs-item" onclick="event.stopPropagation(); triggerToast('📖 中美元首通话 · 进入资讯')">
+              <span class="hs-rank hs-rank-1">1</span>
+              <span class="hs-txt">中美元首今晚通话 · 双方确认了 4 个议题</span>
+              <span class="hs-hot">沸</span>
+            </div>
+            <div class="hs-item" onclick="event.stopPropagation(); triggerToast('📖 A 股跳水 · 进入资讯')">
+              <span class="hs-rank hs-rank-2">2</span>
+              <span class="hs-txt">A 股盘中跳水 · 外资单日净流出 87 亿</span>
+              <span class="hs-hot">热</span>
+            </div>
+            <div class="hs-item" onclick="event.stopPropagation(); triggerToast('📖 台海演训 · 进入资讯')">
+              <span class="hs-rank hs-rank-3">3</span>
+              <span class="hs-txt">东部战区发布台海演训视频</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed 2：Anthropic 视频（模拟自动播放）-->
+      <div class="ifeed-item ifeed-video" data-feed-index="1">
+        <div class="ifeed-bg">
+          <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80" alt="">
+          <div class="ifeed-bg-gradient dark"></div>
+        </div>
+
+        <!-- 视频控件层 -->
+        <div class="ifeed-video-layer">
+          <div class="ifeed-play-indicator">
+            <div class="play-dot play-dot-1"></div>
+            <div class="play-dot play-dot-2"></div>
+            <div class="play-dot play-dot-3"></div>
+            <span class="play-label">正在自动播放</span>
+          </div>
+          <div class="ifeed-video-progress">
+            <div class="ifvp-bar"></div>
+          </div>
+        </div>
+
+        <div class="ifeed-chip-top">
+          <span class="ifeed-chip chip-video">▶ 视频 · 8:42</span>
+        </div>
+
+        <div class="ifeed-right-rail">
+          <div class="irr-item"><div class="irr-avatar"><span>A</span></div></div>
+          <div class="irr-item" onclick="iFeedLike(this, event)"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="irr-count">24.1w</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">5,421</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></div><div class="irr-count">1.2w</div></div>
+        </div>
+
+        <div class="ifeed-bottom dark">
+          <h2 class="ifeed-video-title">Computer Use 2.0 发布会完整回放：Claude 正式能"用电脑"了</h2>
+        </div>
+      </div>
+
+      <!-- Feed 3：美以裂痕（一图读懂 · 首页植入读懂入口）-->
+      <div class="ifeed-item ifeed-article ifeed-manga-entry" data-feed-index="2">
+        <div class="ifeed-bg">
+          <img src="https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=800&q=80" alt="">
+          <div class="ifeed-bg-gradient"></div>
+        </div>
+        <div class="ifeed-article-content">
+          <div class="ifeed-chip chip-hot">🌍 全球视野</div>
+          <h1 class="ifeed-headline">伊朗硝烟中的美以裂痕<br>5 月 1 日红线与特朗普的抉择</h1>
+          <div class="ifeed-excerpt">
+            <p>美军对伊朗行动已进入第 50 天。根据 1973 年《战争权力法》，60 天授权窗口将于 <strong>5 月 1 日</strong> 到期——特朗普面临三条路：寻求国会授权、用仅有一次的 30 天延期、或无视期限与国会公开对抗。</p>
+            <p>以色列的"核威胁红线"论述和华盛顿的选举日历正在正面相撞。油价已飙至 $135，共和党内部有议员开始……</p>
+          </div>
+        </div>
+
+        <!-- 读懂入口：首页植入 Agent 读懂能力 -->
+        <div class="ifeed-dongdu-entry" onclick="event.stopPropagation(); switchScene('manga')">
+          <div class="ide-icon">🎨</div>
+          <div class="ide-body">
+            <div class="ide-title">Agent 把 4,200 字画成了一张图</div>
+            <div class="ide-sub">一图读懂 · 点沙漏、压力锅、三条路看解读</div>
+          </div>
+          <div class="ide-arrow">›</div>
+        </div>
+
+        <div class="ifeed-fade-cta" onclick="triggerToast('📖 进入原报道')">
+          <div class="ifeed-fade-gradient"></div>
+          <button class="ifeed-read-btn">阅读原文 <span>›</span></button>
+        </div>
+        <div class="ifeed-right-rail">
+          <div class="irr-item"><div class="irr-avatar"><span>国</span></div></div>
+          <div class="irr-item" onclick="iFeedLike(this, event)"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="irr-count">31w</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">6,284</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">8.9w</div></div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Feed 4：播客（视频位）-->
+      <div class="ifeed-item ifeed-video ifeed-podcast" data-feed-index="3">
+        <div class="ifeed-bg">
+          <img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80" alt="">
+          <div class="ifeed-bg-gradient dark purple"></div>
+        </div>
+
+        <!-- 播客波形 -->
+        <div class="ifeed-podcast-wave">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="ifeed-play-indicator">
+          <div class="play-dot play-dot-1"></div>
+          <div class="play-dot play-dot-2"></div>
+          <div class="play-dot play-dot-3"></div>
+          <span class="play-label">正在播放 12:34 / 54:12</span>
+        </div>
+
+        <div class="ifeed-chip-top">
+          <span class="ifeed-chip chip-audio">🎧 播客 · 你订阅了</span>
+        </div>
+
+        <div class="ifeed-right-rail">
+          <div class="irr-item"><div class="irr-avatar"><span>LS</span></div></div>
+          <div class="irr-item" onclick="iFeedLike(this, event)"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="irr-count">3.2w</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">412</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">1.8w</div></div>
+        </div>
+
+        <div class="ifeed-bottom dark">
+          <span class="ifeed-chip chip-audio-title">Latent Space Podcast</span>
+          <h2 class="ifeed-video-title">Harness Engineering 会成为独立工种吗？</h2>
+          <div class="ifeed-author">
+            <div class="ifa-avatar dark-avatar">S</div>
+            <div class="ifa-info">
+              <div class="ifa-name light">Swyx × Harrison Chase</div>
+              <div class="ifa-meta light">今天上线 · 54:12</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed 5：长白山暴雪（视频）-->
+      <div class="ifeed-item ifeed-video" data-feed-index="4">
+        <div class="ifeed-bg">
+          <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80" alt="">
+          <div class="ifeed-bg-gradient dark"></div>
+        </div>
+        <div class="ifeed-video-layer">
+          <div class="ifeed-play-indicator">
+            <div class="play-dot play-dot-1"></div>
+            <div class="play-dot play-dot-2"></div>
+            <div class="play-dot play-dot-3"></div>
+            <span class="play-label">正在自动播放</span>
+          </div>
+          <div class="ifeed-video-progress"><div class="ifvp-bar"></div></div>
+        </div>
+        <div class="ifeed-chip-top">
+          <span class="ifeed-chip chip-video">▶ 视频 · 2:18</span>
+          <span class="ifeed-chip chip-verified">🛡 已核实</span>
+        </div>
+        <div class="ifeed-right-rail">
+          <div class="irr-item"><div class="irr-avatar"><span>现</span></div></div>
+          <div class="irr-item" onclick="iFeedLike(this, event)"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="irr-count">42w</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">8,712</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">12w</div></div>
+        </div>
+        <div class="ifeed-bottom dark">
+          <span class="ifeed-chip chip-video-title">腾讯新闻现场</span>
+          <h2 class="ifeed-video-title">长白山暴雪红色预警：滑雪游客请立即下撤</h2>
+          <div class="ifeed-author">
+            <div class="ifa-avatar dark-avatar">现</div>
+            <div class="ifa-info">
+              <div class="ifa-name light">腾讯新闻现场</div>
+              <div class="ifa-meta light">1 小时前 · 2:18</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed 6：Paul Graham 图文 -->
+      <div class="ifeed-item ifeed-article" data-feed-index="5">
+        <div class="ifeed-bg">
+          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80" alt="">
+          <div class="ifeed-bg-gradient"></div>
+        </div>
+        <div class="ifeed-article-content">
+          <div class="ifeed-chip chip-slow">🧠 慢读 · 译文</div>
+          <h1 class="ifeed-headline">为什么最好的 AI 产品<br>反而不像 AI 产品</h1>
+          <div class="ifeed-excerpt">
+            <p>Paul Graham 在他的新 Essay 里指出了一个反直觉的现象：2026 年真正赚到钱的 AI 产品，几乎没有一个把"AI"当作核心卖点。</p>
+            <p>他举了三个例子：Cursor 卖的不是"AI 写代码"，卖的是"写代码变轻松了"；Perplexity 卖的不是"AI 搜索"，卖的是"不用再翻 10 个链接了"；甚至 ChatGPT 卖的……</p>
+          </div>
+        </div>
+        <div class="ifeed-fade-cta" onclick="triggerToast('📖 进入文章详情页')">
+          <div class="ifeed-fade-gradient"></div>
+          <button class="ifeed-read-btn">阅读原文 <span>›</span></button>
+        </div>
+        <div class="ifeed-right-rail">
+          <div class="irr-item"><div class="irr-avatar"><span>PG</span></div></div>
+          <div class="irr-item" onclick="iFeedLike(this, event)"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><div class="irr-count">6.1w</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">942</div></div>
+          <div class="irr-item"><div class="irr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></div><div class="irr-count">2.8w</div></div>
+        </div>
+        <div class="ifeed-bottom">
+          <div class="ifeed-author">
+            <div class="ifa-avatar">译</div>
+            <div class="ifa-info">
+              <div class="ifa-name">PG Essays 译者圈</div>
+              <div class="ifa-meta">译自 paulgraham.com · 3200 词</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- 滑动提示（仅第一次出现）-->
+    <div class="swipe-hint" id="swipe-hint">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16M5 11l7-7 7 7"/></svg>
+      <span>上滑看下一条</span>
+    </div>
+  </div>
+
+  <!-- ============ 场景 2：文章详情页（image2 报道 + 内嵌 Agent）============ -->
+  <div class="scene scene-article" data-scene="article">
+    <div class="article-nav">
+      <button class="art-back" data-back="home">‹ 首页</button>
+      <button class="art-more">⋯</button>
+    </div>
+
+    <div class="article-scroll" id="article-scroll">
+
+      <div class="art-head">
+        <div class="art-tag-row">
+          <span class="art-tag art-tag-hot">🔥 你一直在等的</span>
+          <span class="art-tag art-tag-v">🛡 已核实</span>
+        </div>
+        <h1 class="art-title">GPT-image 2 实测 3 小时：AI 生成图像真的能以假乱真了</h1>
+        <div class="art-byline">
+          <div class="art-avatar-dot">张</div>
+          <div class="art-byline-info">
+            <div class="art-author">张译 · 腾讯新闻科技</div>
+            <div class="art-stamp">2 小时前 · 6 分钟读</div>
+          </div>
+        </div>
+      </div>
+
+      <img class="art-cover" src="https://images.unsplash.com/photo-1686191128892-f7434b8e8e7e?w=800&auto=format&fit=crop&q=80" alt="">
+
+      <!-- Agent 智能导读条 -->
+      <div class="agent-reading-bar">
+        <div class="arb-avatar">
+          <svg width="16" height="16" viewBox="0 0 32 32" fill="white"><rect x="7" y="9" width="18" height="16" rx="6"/><circle cx="12" cy="16" r="1.8" fill="#0084ff"/><circle cx="20" cy="16" r="1.8" fill="#0084ff"/></svg>
+        </div>
+        <div class="arb-body">
+          <div class="arb-title">Agent 陪你读这篇</div>
+          <div class="arb-actions">
+            <button class="arb-chip" onclick="openArticleAgent('summary')">📝 太长不看</button>
+            <button class="arb-chip" onclick="openArticleAgent('relate')">💭 对我有什么用</button>
+            <button class="arb-chip" onclick="openArticleAgent('ask')">💬 我想追问</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="art-body">
+        <p>2026 年 4 月 24 日凌晨，OpenAI 悄悄上线了 GPT-image 2。官方博客只有三段话，没有发布会，没有 Sam 推特预热——但在之后的三个小时里，这个模型已经让整个内容圈集体失眠。</p>
+
+        <p>它到底强在哪？我们用 500 个测试 prompt 跑了一晚上，结论是：<strong>这是第一个能在细节层面骗过人眼的公开模型</strong>。</p>
+
+        <h2>一、实测：15 分钟生成一套完整品牌视觉</h2>
+
+        <p>我们给它一个简单的 brief："做一个叫 Loopfold 的独立开发者工具品牌，面向开发者，有一点复古计算机的美学。" 没给任何参考图。</p>
+
+        <p>15 分钟，image2 直接产出了：Logo 主稿、4 种延展变体、首屏 Banner、3 张 OG 分享图、甚至一整套 favicon。<strong>每一张都能直接用</strong>，不需要 Photoshop 修边。</p>
+
+        <!-- Agent 即时洞察（正文段落间）-->
+        <div class="agent-inline" onclick="openArticleAgent('inline-1')">
+          <div class="ai-label">💡 Agent 注意到</div>
+          <div class="ai-text">这段讲的能力，对你"用 AI 做内容运营"可能很有用。<span class="ai-link">帮你想想能落地什么 →</span></div>
+        </div>
+
+        <h2>二、关键突破：它终于学会"细节一致性"</h2>
+
+        <p>此前所有 AI 图像模型都有一个顽疾——同一个角色，生成到第三张图就崩了：脸变了、衣服花纹错乱。image2 第一次做到了<strong>跨 20 张图的人物一致性</strong>。</p>
+
+        <p>Simon Willison 在他的实测博客里给了一个更直接的评价：<em>"It's the first model where I stopped looking for the AI tell."</em>（这是第一个让我不再寻找 AI 痕迹的模型。）</p>
+
+        <h2>三、眼见不一定为实：内容鉴伪的新难题</h2>
+
+        <p>更让人担心的是它的"编故事能力"。我们让它生成"一张新闻现场照片 + 说明文字"，结果它不仅生成了逼真的照片，还配了一段 200 字的现场说明——而这件"新闻"从未发生过。</p>
+
+        <p>发布 3 小时，推特上已经有人拿它生成的产品图骗过了 eBay 商家。</p>
+
+        <div class="agent-inline" onclick="openArticleAgent('inline-2')">
+          <div class="ai-label">⚠️ Agent 提醒</div>
+          <div class="ai-text">这段跟你"内容运营 × 事实核查"的工作流直接相关。<span class="ai-link">我帮你想想该调整什么 →</span></div>
+        </div>
+
+        <h2>四、创作者怎么看：焦虑还是机会？</h2>
+
+        <p>我们采访了 5 位独立内容创作者。观点几乎一致分成两派：</p>
+
+        <ul>
+          <li>焦虑派："以后客户更不会为素人插画师的稿费买单了。"</li>
+          <li>机会派："终于能一个人做出过去 5 个人的产出，独立开发者时代真的来了。"</li>
+        </ul>
+
+        <p>Lenny Rachitsky 在 newsletter 里引用了一个数字：<strong>过去 7 天，ProductHunt 上基于 image2 API 的新产品已经上了 14 个</strong>——这比模型正式发布还早。</p>
+
+        <h2>五、什么时候能用上？</h2>
+
+        <p>API 已开放，每千张图 $40；ChatGPT Plus 用户今晚会收到灰度推送；国内用户可通过 OpenRouter 或 Replicate 间接调用。</p>
+
+        <p>我们评估：<strong>未来 30 天，会有一批新的"AI 原生内容产品"在这个模型基础上爆发</strong>。</p>
+
+        <div class="h-32"></div>
+      </div>
+    </div>
+
+    <!-- 底部 Agent 浮条 -->
+    <div class="article-bottom-agent" onclick="openArticleAgent('float')">
+      <div class="aba-dot"></div>
+      <span class="aba-text">Agent 已陪你读完这篇 · 点击追问</span>
+    </div>
+
+    <!-- Agent 对话抽屉 -->
+    <div class="art-agent-drawer" id="art-agent-drawer">
+      <div class="aad-head">
+        <div class="aad-handle"></div>
+        <div class="aad-title">
+          <span>💬 Agent · 这篇 image2 报道</span>
+          <button class="aad-close" onclick="closeArticleAgent()">×</button>
+        </div>
+      </div>
+      <div class="aad-body" id="aad-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ 场景 3：Agent 页（核心创新页）============ -->
+  <div class="scene scene-agent" data-scene="agent">
+    <div class="agent-top">
+      <div class="agent-top-inner">
+        <div class="agent-greet">
+          <div class="agent-greet-avatar">
+            <svg width="22" height="22" viewBox="0 0 32 32" fill="white"><rect x="7" y="9" width="18" height="16" rx="6"/><circle cx="12" cy="16" r="1.8" fill="#0084ff"/><circle cx="20" cy="16" r="1.8" fill="#0084ff"/><path d="M13 20q3 1.5 6 0" stroke="#0084ff" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          </div>
+          <div>
+            <div class="agent-greet-title">早安</div>
+            <div class="agent-greet-sub">我看了今早 2,147 条新闻，给你挑了 3 件值得关心的</div>
+          </div>
+        </div>
+
+        <!-- Agent 卡片列表：个性化反馈 -->
+        <div class="agent-cards">
+
+          <div class="agent-card" data-goto="sandbox">
+            <div class="ac-head">
+              <span class="ac-tag">💰 关乎你的钱包</span>
+              <span class="ac-time">3 分钟前</span>
+            </div>
+            <div class="ac-title">央行释放利率维稳信号</div>
+            <div class="ac-desc">简单说：房贷利率短期内不会大变。如果你有房贷焦虑，可以拖拖滑块看看未来趋势。</div>
+            <button class="ac-cta">📊 进入互动沙盘 →</button>
+          </div>
+
+          <div class="agent-card" data-goto="factcheck">
+            <div class="ac-head">
+              <span class="ac-tag tag-orange">⚠️ 家族群在传</span>
+              <span class="ac-time">12 分钟前</span>
+            </div>
+            <div class="ac-title">"某地出台房产新政"正在朋友圈刷屏</div>
+            <div class="ac-desc">事实核查组已经拿到原始文件。3 秒帮你辨真假，转发前看一眼。</div>
+            <button class="ac-cta">🎲 快判一下 →</button>
+          </div>
+
+          <div class="agent-card" data-goto="graph">
+            <div class="ac-head">
+              <span class="ac-tag tag-purple">🚗 深度推荐</span>
+              <span class="ac-time">早上</span>
+            </div>
+            <div class="ac-title">三款新能源 SUV 横评</div>
+            <div class="ac-desc">4000 字长文太长？我已经把三款车、六个维度的关系整理成了一张可互动的图谱。</div>
+            <button class="ac-cta">🗺 看关系图谱 →</button>
+          </div>
+
+        </div>
+
+        <!-- 快捷许愿输入框（Loopit 式）-->
+        <div class="wish-bar">
+          <div class="wish-avatar">
+            <svg width="16" height="16" viewBox="0 0 32 32" fill="white"><rect x="7" y="9" width="18" height="16" rx="6"/><circle cx="12" cy="16" r="1.8" fill="#0084ff"/><circle cx="20" cy="16" r="1.8" fill="#0084ff"/></svg>
+          </div>
+          <input type="text" placeholder="跟我说：今天最想了解什么？" readonly onclick="triggerToast('🔍 埋点：wish_input_focus · 演示省略')">
+          <button class="wish-mic">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 下半屏：读懂新闻 Feed 流 -->
+    <div class="playable-feed-label">
+      <span>🧩 读懂这些事</span>
+      <span class="pfl-hint">互动式 · 而不是只能读</span>
+    </div>
+
+    <!-- 4 种核心内容形态（大图，参考 Loopit Playable 框架）-->
+    <div class="playable-feed" id="playable-feed">
+
+      <!-- 形态 1：一图读懂漫画（头部大横幅） -->
+      <div class="pf-card pf-card-1" data-goto="manga">
+        <div class="pf-bg" style="background:linear-gradient(135deg,#4a1a1a 0%,#8b2525 50%,#4a1a1a 100%)">
+          <img src="https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=800&q=80" alt="">
+        </div>
+        <div class="pf-content">
+          <div class="pf-type">🎨 一图读懂</div>
+          <div class="pf-title">伊朗硝烟中的美以裂痕：5月1日红线</div>
+          <div class="pf-desc">Agent 把 4000 字长文画成一张信息漫画</div>
+        </div>
+        <div class="pf-corner-badge">NEW</div>
+      </div>
+
+      <!-- 形态 2：数据沙盘 -->
+      <div class="pf-card pf-card-2" data-goto="sandbox">
+        <div class="pf-bg" style="background:linear-gradient(135deg,#2d1a42 0%,#5a3a95 100%)">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80" alt="">
+        </div>
+        <div class="pf-content">
+          <div class="pf-type">📊 数据沙盘</div>
+          <div class="pf-title">央行利率 → 你的房贷</div>
+          <div class="pf-desc">拖滑块看未来怎么变</div>
+        </div>
+      </div>
+
+      <!-- 形态 3：动态可视化（台风） -->
+      <div class="pf-card pf-card-3" data-goto="typhoon">
+        <div class="pf-bg" style="background:linear-gradient(135deg,#0a3a5c 0%,#1e6b9a 50%,#0a3a5c 100%)">
+          <img src="https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=600&q=80" alt="">
+        </div>
+        <div class="pf-content">
+          <div class="pf-type">🌀 动态可视化</div>
+          <div class="pf-title">今年第 1 号台风路径实时</div>
+          <div class="pf-desc">点击任意时刻看当时风力</div>
+        </div>
+      </div>
+
+      <!-- 形态 4：多人辩论厅 -->
+      <div class="pf-card pf-card-2" data-goto="debate">
+        <div class="pf-bg" style="background:linear-gradient(135deg,#421a1a 0%,#953a3a 100%)">
+          <img src="https://images.unsplash.com/photo-1591522810850-58128c5fb089?w=600&q=80" alt="">
+        </div>
+        <div class="pf-content">
+          <div class="pf-type">🗣 辩论厅</div>
+          <div class="pf-title">美以伊冲突还会打多久？</div>
+          <div class="pf-desc">2,341 人正在辩论 · LIVE</div>
+        </div>
+        <div class="pf-live-dot">● LIVE</div>
+      </div>
+
+      <!-- 下面是工具型能力（小卡）-->
+      <div class="pf-small-label">🛠 还可以这样读</div>
+
+      <div class="pf-small-grid">
+        <div class="pf-small" data-goto="graph">
+          <div class="pf-small-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">🗺</div>
+          <div class="pf-small-body">
+            <div class="pf-small-title">关系图谱</div>
+            <div class="pf-small-desc">长文变一张图</div>
+          </div>
+        </div>
+        <div class="pf-small" data-goto="factcheck">
+          <div class="pf-small-icon" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">🎲</div>
+          <div class="pf-small-body">
+            <div class="pf-small-title">真假快判</div>
+            <div class="pf-small-desc">3 秒辨真假</div>
+          </div>
+        </div>
+        <div class="pf-small" data-goto="remix">
+          <div class="pf-small-icon" style="background:linear-gradient(135deg,#10b981,#047857)">⚡</div>
+          <div class="pf-small-body">
+            <div class="pf-small-title">太长不看</div>
+            <div class="pf-small-desc">原文 vs 速览</div>
+          </div>
+        </div>
+        <div class="pf-small" data-goto="chat">
+          <div class="pf-small-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">💬</div>
+          <div class="pf-small-body">
+            <div class="pf-small-title">深度追问</div>
+            <div class="pf-small-desc">聊聊这条</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-32"></div>
+    </div>
+  </div>
+
+  <!-- ============ 场景 3：事件关系图谱 ============ -->
+  <div class="scene scene-graph" data-scene="graph">
+    <div class="immersive-top">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type">🗺 互动关系图谱</div>
+        <div class="imm-sub">新能源 SUV 横评</div>
+      </div>
+      <button class="imm-remix" onclick="triggerRemix()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7M10 21H3v-7M21 3l-9 9M3 21l9-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        原文
+      </button>
+    </div>
+
+    <div class="graph-stage">
+      <svg class="graph-svg" viewBox="0 0 390 600">
+        <!-- 连线 -->
+        <line x1="195" y1="300" x2="110" y2="170" class="g-line" stroke-dasharray="4,4"/>
+        <line x1="195" y1="300" x2="280" y2="170" class="g-line" stroke-dasharray="4,4"/>
+        <line x1="195" y1="300" x2="195" y2="460" class="g-line" stroke-dasharray="4,4"/>
+        <line x1="195" y1="300" x2="80" y2="430" class="g-line" stroke-dasharray="4,4"/>
+        <line x1="195" y1="300" x2="310" y2="430" class="g-line" stroke-dasharray="4,4"/>
+
+        <!-- 中心节点 -->
+        <g class="g-node center" data-node="center" onclick="selectGraphNode('center')">
+          <circle cx="195" cy="300" r="44" fill="#0084ff"/>
+          <text x="195" y="295" text-anchor="middle" font-size="12" fill="white" font-weight="700">25-35万</text>
+          <text x="195" y="312" text-anchor="middle" font-size="10" fill="white" opacity="0.9">中型 SUV</text>
+        </g>
+
+        <!-- 蔚来 -->
+        <g class="g-node" data-node="nio" onclick="selectGraphNode('nio')">
+          <circle cx="110" cy="170" r="36" fill="#fff" stroke="#0084ff" stroke-width="2"/>
+          <text x="110" y="168" text-anchor="middle" font-size="13" fill="#0d1421" font-weight="700">蔚来</text>
+          <text x="110" y="183" text-anchor="middle" font-size="9" fill="#8892a6">ET5T</text>
+        </g>
+
+        <!-- 极越（重点）-->
+        <g class="g-node highlight" data-node="jiyue" onclick="selectGraphNode('jiyue')">
+          <circle cx="280" cy="170" r="42" fill="#fff" stroke="#0084ff" stroke-width="3"/>
+          <text x="280" y="165" text-anchor="middle" font-size="13" fill="#0d1421" font-weight="700">极越</text>
+          <text x="280" y="180" text-anchor="middle" font-size="9" fill="#8892a6">07 · 智驾优</text>
+          <circle cx="280" cy="170" r="50" fill="none" stroke="#0084ff" stroke-width="1" opacity="0.5" class="g-pulse"/>
+        </g>
+
+        <!-- 理想 -->
+        <g class="g-node" data-node="lixiang" onclick="selectGraphNode('lixiang')">
+          <circle cx="195" cy="460" r="36" fill="#fff" stroke="#0084ff" stroke-width="2"/>
+          <text x="195" y="458" text-anchor="middle" font-size="13" fill="#0d1421" font-weight="700">理想</text>
+          <text x="195" y="473" text-anchor="middle" font-size="9" fill="#8892a6">L6</text>
+        </g>
+
+        <!-- 智驾 -->
+        <g class="g-node small" data-node="zhijia" onclick="selectGraphNode('zhijia')">
+          <circle cx="80" cy="430" r="28" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="80" y="428" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">🤖</text>
+          <text x="80" y="443" text-anchor="middle" font-size="9" fill="#92400e">智驾</text>
+        </g>
+
+        <!-- 电池 -->
+        <g class="g-node small" data-node="battery" onclick="selectGraphNode('battery')">
+          <circle cx="310" cy="430" r="28" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="310" y="428" text-anchor="middle" font-size="11" fill="#166534" font-weight="600">🔋</text>
+          <text x="310" y="443" text-anchor="middle" font-size="9" fill="#166534">电池</text>
+        </g>
+      </svg>
+
+      <!-- 节点详情卡（浮层）-->
+      <div id="node-detail" class="node-detail-card">
+        <div class="nd-head">
+          <div class="nd-title" id="nd-title">点击任意节点查看详情</div>
+          <div class="nd-sub" id="nd-sub">可缩放 · 可点击 · 可追问</div>
+        </div>
+        <div class="nd-body" id="nd-body">
+          <div class="nd-placeholder">选择一个节点试试 ↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景 4：财经数据沙盘 ============ -->
+  <div class="scene scene-sandbox" data-scene="sandbox">
+    <div class="immersive-top">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type">📊 数据沙盘</div>
+        <div class="imm-sub">利率如何影响你的房贷</div>
+      </div>
+      <button class="imm-remix" onclick="triggerRemix()">📰 原文</button>
+    </div>
+
+    <div class="sandbox-stage">
+      <div class="sb-headline">
+        如果央行把利率<strong>调整到：</strong>
+      </div>
+
+      <div class="sb-slider-card">
+        <div class="sb-val-row">
+          <div class="sb-val-item">
+            <div class="sb-val-label">LPR 利率</div>
+            <div class="sb-val-num" id="sb-rate">2.0<span>%</span></div>
+          </div>
+          <div class="sb-val-item">
+            <div class="sb-val-label">月供变化</div>
+            <div class="sb-val-num neutral" id="sb-payment">0<span>元</span></div>
+          </div>
+        </div>
+        <input type="range" id="sb-slider" class="sb-slider" min="0" max="100" value="50">
+        <div class="sb-slider-marks">
+          <span>1.0%</span><span>2.0%</span><span>3.0%</span>
+        </div>
+      </div>
+
+      <div class="sb-chart-card">
+        <div class="sb-chart-title">房价走势预测（未来 12 个月）</div>
+        <svg id="sb-chart" viewBox="0 0 350 150" class="sb-chart">
+          <line x1="0" y1="40" x2="350" y2="40" stroke="#e4e8f0" stroke-dasharray="3,3"/>
+          <line x1="0" y1="75" x2="350" y2="75" stroke="#e4e8f0" stroke-dasharray="3,3"/>
+          <line x1="0" y1="110" x2="350" y2="110" stroke="#e4e8f0" stroke-dasharray="3,3"/>
+          <path id="sb-path" d="M0 75 L 70 75 L 140 75 L 210 75 L 280 75 L 350 75" fill="none" stroke="#0084ff" stroke-width="3" stroke-linecap="round"/>
+          <path id="sb-area" d="M0 75 L 70 75 L 140 75 L 210 75 L 280 75 L 350 75 L 350 150 L 0 150 Z" fill="url(#sb-grad)" opacity="0.2"/>
+          <defs>
+            <linearGradient id="sb-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0084ff"/>
+              <stop offset="100%" stop-color="#0084ff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="sb-chart-legend">
+          <div class="sb-legend-item"><span class="dot dot-blue"></span>房价同比</div>
+          <div class="sb-legend-item" id="sb-trend">→ 基本持平</div>
+        </div>
+      </div>
+
+      <div class="sb-insight-card">
+        <div class="sb-insight-icon">💡</div>
+        <div class="sb-insight-body">
+          <div class="sb-insight-title" id="sb-insight-title">Agent 解读</div>
+          <div class="sb-insight-text" id="sb-insight-text">拖动上面的滑块，看看利率怎么影响你的钱包。</div>
+        </div>
+      </div>
+
+      <div class="sb-source">
+        数据来源：腾讯新闻财经 + 央行公开数据 · <span class="badge-verified-inline">已核实</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景 5：真假快判 ============ -->
+  <div class="scene scene-factcheck" data-scene="factcheck">
+    <div class="immersive-top dark">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type" style="color:#fff">🎲 真假快判</div>
+        <div class="imm-sub" style="color:rgba(255,255,255,0.6)">3 秒判断</div>
+      </div>
+      <button class="imm-remix" onclick="triggerRemix()" style="color:#fff;border-color:rgba(255,255,255,0.3)">📰 原文</button>
+    </div>
+
+    <div class="fc-stage">
+      <div class="fc-question-card" id="fc-card">
+        <div class="fc-level">第 1 题 · 本周刷屏</div>
+        <div class="fc-quote">
+          "某地今日出台房产新政，首套房贷首付降至 15%，限购全面取消。"
+        </div>
+        <div class="fc-hint">—— 家族群早上开始疯传 · 配图是张<br>市政府大楼的旧照</div>
+
+        <div class="fc-timer" id="fc-timer">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
+            <circle id="fc-timer-ring" cx="40" cy="40" r="36" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <text x="40" y="47" text-anchor="middle" font-size="24" fill="white" font-weight="700" id="fc-countdown">3</text>
+          </svg>
+        </div>
+
+        <div class="fc-actions">
+          <button class="fc-btn fc-fake" onclick="fcAnswer('fake')">❌ 假的</button>
+          <button class="fc-btn fc-real" onclick="fcAnswer('real')">✅ 真的</button>
+        </div>
+      </div>
+
+      <!-- 结果卡（隐藏）-->
+      <div class="fc-result-card" id="fc-result" style="display:none">
+        <div class="fc-result-icon">🚫</div>
+        <div class="fc-result-verdict">这是<strong>假消息</strong></div>
+        <div class="fc-result-reason">
+          事实核查组 30 分钟前已经核实：<br>
+          ① 当地政府未发布任何类似文件<br>
+          ② 配图是 2019 年的新闻图<br>
+          ③ "首付 15%" 的表述不符合当前政策框架
+        </div>
+        <div class="fc-result-source">
+          信源：事实核查组 · 已交叉比对 3 个权威渠道 · <span class="badge-verified-inline">已核实</span>
+        </div>
+        <button class="fc-share-btn" onclick="triggerToast('🔍 埋点：share_factcheck · 社交分发已授权')">📲 转发给家族群</button>
+        <button class="fc-continue" onclick="fcNext()">再来一题 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景：读懂（原文 / 太长不看 二选）============ -->
+  <div class="scene scene-remix" data-scene="remix">
+    <div class="immersive-top">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type">🧩 读懂</div>
+        <div class="imm-sub">原文 vs 太长不看</div>
+      </div>
+    </div>
+
+    <div class="remix-stage">
+      <!-- 顶部二选切换 -->
+      <div class="remix-switcher two-col">
+        <button class="rm-style active" data-style="orig" onclick="switchRemixStyle('orig')">📰 原文</button>
+        <button class="rm-style" data-style="tldr" onclick="switchRemixStyle('tldr')">⚡ 太长不看</button>
+      </div>
+
+      <!-- 内容区 -->
+      <div class="remix-output" id="remix-output"></div>
+
+      <div class="remix-disclaimer">
+        🔒 「太长不看」只在客观事实基础上做精简和关联分析，不改动原始数据与溯源。
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景 7：Chatbot 深度追问 ============ -->
+  <div class="scene scene-chat" data-scene="chat">
+    <div class="immersive-top">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type">💬 深度追问</div>
+        <div class="imm-sub">跟腾讯财经 Agent 聊聊</div>
+      </div>
+    </div>
+
+    <div class="chat-stage" id="chat-stage">
+      <div class="chat-article-ref">
+        <img src="https://images.unsplash.com/photo-1686191128892-f7434b8e8e7e?w=200&auto=format&fit=crop&q=80" alt="">
+        <div>
+          <div class="car-t">GPT-image 2 实测 3 小时</div>
+          <div class="car-s">腾讯新闻科技 · 你刚读完</div>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-bubble chat-bot">
+          我是腾讯新闻 AI 分析师，我已经完整读过这篇 image2 报道。<br><br>
+          想聊哪个方向？
+          <div class="chat-suggest">
+            <button class="cs-btn" onclick="chatAsk('这个模型会影响到我做的内容运营工作吗？')">会影响我的内容运营工作吗？</button>
+            <button class="cs-btn" onclick="chatAsk('对想做 AI 独立开发者的人意味着什么？')">对想独立开发的人意味着什么？</button>
+            <button class="cs-btn" onclick="chatAsk('怎么快速接入到我的 Claude Code 工作流？')">怎么接入 Claude Code 工作流？</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-bar">
+        <input type="text" id="chat-input" placeholder="随便问 · 想到什么问什么" onkeypress="if(event.key==='Enter') chatSend()">
+        <button class="chat-send" onclick="chatSend()">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景：一图读懂漫画（伊朗美以局势）============ -->
+  <div class="scene scene-manga" data-scene="manga">
+    <div class="immersive-top dark">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type" style="color:#fff">🎨 一图读懂</div>
+        <div class="imm-sub" style="color:rgba(255,255,255,0.6)">4000 字报道 → 一张漫画</div>
+      </div>
+      <button class="imm-remix" onclick="triggerToast('🔄 重新生成漫画')">🔄</button>
+    </div>
+
+    <div class="manga-stage">
+      <!-- 标题横幅 -->
+      <div class="manga-banner">
+        <svg width="100%" height="44" viewBox="0 0 360 44" preserveAspectRatio="none">
+          <path d="M0 8 L20 0 L340 0 L360 8 L360 36 L340 44 L20 44 L0 36 Z" fill="#f4e8d4" stroke="#8b6f47" stroke-width="1"/>
+        </svg>
+        <div class="manga-banner-text">伊朗硝烟中的美以裂痕：5月1日红线与特朗普的抉择</div>
+      </div>
+
+      <!-- 主画面 SVG -->
+      <div class="manga-canvas">
+        <svg viewBox="0 0 360 600" class="manga-svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="mangaBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8b2525"/>
+              <stop offset="100%" stop-color="#4a1a1a"/>
+            </linearGradient>
+            <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <rect width="360" height="600" fill="url(#mangaBg)"/>
+
+          <!-- 沙漏 -->
+          <g class="manga-hourglass" onclick="mangaTap('hourglass')">
+            <ellipse cx="180" cy="50" rx="60" ry="8" fill="url(#glow)"/>
+            <!-- 沙漏框架 -->
+            <rect x="140" y="46" width="80" height="6" fill="#8b6f47" rx="2"/>
+            <rect x="140" y="128" width="80" height="6" fill="#8b6f47" rx="2"/>
+            <!-- 玻璃上半 -->
+            <path d="M148 52 L212 52 L180 90 Z" fill="rgba(255,255,255,0.15)" stroke="#c9a66b" stroke-width="1.5"/>
+            <!-- 沙子 -->
+            <path d="M156 58 L204 58 L182 86 L178 86 Z" fill="#fbbf24"/>
+            <!-- 玻璃下半 -->
+            <path d="M180 90 L148 128 L212 128 Z" fill="rgba(255,255,255,0.12)" stroke="#c9a66b" stroke-width="1.5"/>
+            <path d="M168 128 L192 128 L182 110 L178 110 Z" fill="#fbbf24"/>
+            <!-- 时钟显示 -->
+            <rect x="158" y="140" width="44" height="18" fill="#1a0505" rx="3"/>
+            <text x="180" y="154" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff3838">5月1日</text>
+          </g>
+
+          <!-- 说明标签 -->
+          <g class="manga-tag-g" onclick="mangaTap('countdown')">
+            <rect x="100" y="178" width="160" height="26" rx="13" fill="#1a0505" stroke="#fbbf24" stroke-width="1"/>
+            <text x="180" y="195" text-anchor="middle" font-size="11" fill="#fbbf24" font-weight="600">战争权力法 60 天倒计时临近</text>
+          </g>
+
+          <!-- 箭头 -->
+          <path d="M180 208 L180 230 M172 224 L180 232 L188 224" stroke="#fbbf24" stroke-width="2" fill="none"/>
+
+          <!-- 压力锅 + 两侧云状标签 -->
+          <g class="manga-pot" onclick="mangaTap('pressure')">
+            <!-- 云标签左：油价 -->
+            <ellipse cx="80" cy="280" rx="42" ry="22" fill="white" opacity="0.9"/>
+            <text x="80" y="276" text-anchor="middle" font-size="11" fill="#1a1a1a">⛽ 油价</text>
+            <text x="80" y="290" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">↑ 飙升</text>
+            <!-- 云标签右：国会 -->
+            <ellipse cx="280" cy="280" rx="42" ry="22" fill="white" opacity="0.9"/>
+            <text x="280" y="276" text-anchor="middle" font-size="11" fill="#1a1a1a">🏛 国会</text>
+            <text x="280" y="290" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="bold">共和党动摇</text>
+
+            <!-- 锅 -->
+            <ellipse cx="180" cy="320" rx="55" ry="10" fill="#6b7280"/>
+            <path d="M128 320 L132 355 Q132 365 142 367 L218 367 Q228 365 228 355 L232 320" fill="#374151" stroke="#1f2937" stroke-width="1.5"/>
+            <ellipse cx="180" cy="320" rx="50" ry="7" fill="#dc2626"/>
+            <!-- 手柄 -->
+            <rect x="118" y="330" width="12" height="5" fill="#1f2937" rx="2"/>
+            <rect x="230" y="330" width="12" height="5" fill="#1f2937" rx="2"/>
+            <!-- 蒸汽 -->
+            <path d="M160 310 Q158 300 165 295" stroke="white" stroke-width="2" fill="none" opacity="0.7"/>
+            <path d="M180 308 Q182 298 178 292" stroke="white" stroke-width="2" fill="none" opacity="0.7"/>
+            <path d="M200 310 Q202 300 195 295" stroke="white" stroke-width="2" fill="none" opacity="0.7"/>
+          </g>
+
+          <!-- 政治压力标签 -->
+          <g onclick="mangaTap('politics')">
+            <rect x="80" y="380" width="200" height="26" rx="13" fill="white" opacity="0.92"/>
+            <text x="180" y="397" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="600">政治压力 · 特朗普面临多重抉择</text>
+          </g>
+
+          <!-- 三岔路口（人物居中） -->
+          <!-- 路 -->
+          <path d="M180 430 L60 560 M180 430 L180 570 M180 430 L300 560" stroke="#4b5563" stroke-width="40" fill="none" stroke-linecap="round"/>
+          <path d="M180 430 L60 560 M180 430 L180 570 M180 430 L300 560" stroke="white" stroke-width="2" fill="none" stroke-dasharray="6,6"/>
+
+          <!-- 三个选项标签 -->
+          <g onclick="mangaTap('option1')" class="manga-option">
+            <rect x="12" y="456" width="88" height="48" rx="8" fill="#1a0505" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="56" y="475" text-anchor="middle" font-size="11" fill="#fbbf24" font-weight="bold">寻求授权</text>
+            <text x="56" y="493" text-anchor="middle" font-size="10" fill="#fca5a5">受限</text>
+          </g>
+          <g onclick="mangaTap('option2')" class="manga-option">
+            <rect x="136" y="456" width="88" height="48" rx="8" fill="#1a0505" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="180" y="475" text-anchor="middle" font-size="11" fill="#fbbf24" font-weight="bold">30 天延期</text>
+            <text x="180" y="493" text-anchor="middle" font-size="10" fill="#fca5a5">仅一次</text>
+          </g>
+          <g onclick="mangaTap('option3')" class="manga-option">
+            <rect x="260" y="456" width="88" height="48" rx="8" fill="#1a0505" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="304" y="475" text-anchor="middle" font-size="11" fill="#fbbf24" font-weight="bold">无视期限</text>
+            <text x="304" y="493" text-anchor="middle" font-size="10" fill="#fca5a5">代价高</text>
+          </g>
+
+          <!-- 中心人物（简化）-->
+          <g class="manga-trump" onclick="mangaTap('trump')">
+            <circle cx="180" cy="438" r="14" fill="#fdba74"/>
+            <ellipse cx="180" cy="430" rx="12" ry="6" fill="#f59e0b"/>
+            <rect x="173" y="450" width="14" height="20" fill="#1e3a8a"/>
+            <rect x="176" y="452" width="8" height="12" fill="white"/>
+            <path d="M177 456 L177 462 L183 462 L183 456 Z" fill="#dc2626"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 画下的解读 -->
+      <div class="manga-footer">
+        <div class="manga-footer-title">点击任意元素，Agent 会解释</div>
+        <div class="manga-footer-hint" id="manga-hint">
+          ↑ 试试点沙漏、压力锅、三条路
+        </div>
+      </div>
+
+      <!-- 底部 Agent 条 -->
+      <div class="manga-bottom-bar">
+        <div class="manga-ba-dot"></div>
+        <span class="manga-ba-text">Agent 把 4,200 字报道画成了这张图</span>
+        <button class="manga-ba-btn" onclick="switchScene('article')">看原报道</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景：台风路径动态可视化 ============ -->
+  <div class="scene scene-typhoon" data-scene="typhoon">
+    <div class="immersive-top dark">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type" style="color:#fff">🌀 动态可视化</div>
+        <div class="imm-sub" style="color:rgba(255,255,255,0.6)">今年第 1 号台风实时路径</div>
+      </div>
+    </div>
+
+    <div class="typhoon-stage">
+      <!-- 地图区 -->
+      <div class="typhoon-map">
+        <svg viewBox="0 0 390 500" class="typhoon-svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0f1e40"/>
+              <stop offset="100%" stop-color="#0a1428"/>
+            </linearGradient>
+          </defs>
+
+          <rect width="390" height="500" fill="url(#sea)"/>
+
+          <!-- 经纬网 -->
+          <g stroke="rgba(100, 150, 220, 0.15)" stroke-width="0.5" fill="none">
+            <line x1="0" y1="100" x2="390" y2="100"/>
+            <line x1="0" y1="200" x2="390" y2="200"/>
+            <line x1="0" y1="300" x2="390" y2="300"/>
+            <line x1="0" y1="400" x2="390" y2="400"/>
+            <line x1="80" y1="0" x2="80" y2="500"/>
+            <line x1="160" y1="0" x2="160" y2="500"/>
+            <line x1="240" y1="0" x2="240" y2="500"/>
+            <line x1="320" y1="0" x2="320" y2="500"/>
+          </g>
+
+          <!-- 陆地轮廓（简化中国东部+台湾+菲律宾）-->
+          <path d="M0 180 Q20 160 40 170 L60 150 L100 140 L120 160 L140 150 L160 170 L150 200 L180 220 L170 260 L130 280 L100 300 L60 290 L40 270 L20 250 L0 240 Z" fill="#1a3a1a" opacity="0.6"/>
+          <path d="M220 340 L240 320 L260 330 L270 360 L260 380 L240 385 L225 370 Z" fill="#1a3a1a" opacity="0.6"/>
+          <path d="M280 420 L310 410 L325 440 L315 460 L290 455 Z" fill="#1a3a1a" opacity="0.6"/>
+
+          <!-- 预测路径（虚线）-->
+          <path id="typhoon-path-future" d="M320 440 Q280 400 240 350 Q200 300 160 260 Q120 220 80 180" stroke="#60a5fa" stroke-width="2" fill="none" stroke-dasharray="6,4" opacity="0.5"/>
+
+          <!-- 已走路径（实线渐变）-->
+          <path id="typhoon-path-past" d="M340 460 L335 455" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+          <!-- 路径上的节点（点可交互）-->
+          <g id="typhoon-points">
+            <circle class="tp-point" data-idx="0" cx="340" cy="460" r="8" fill="#ef4444"/>
+            <circle class="tp-point" data-idx="1" cx="320" cy="440" r="7" fill="#fbbf24"/>
+            <circle class="tp-point" data-idx="2" cx="290" cy="410" r="7" fill="#60a5fa" opacity="0.6"/>
+            <circle class="tp-point" data-idx="3" cx="250" cy="360" r="7" fill="#60a5fa" opacity="0.5"/>
+            <circle class="tp-point" data-idx="4" cx="200" cy="300" r="7" fill="#60a5fa" opacity="0.4"/>
+            <circle class="tp-point" data-idx="5" cx="140" cy="240" r="7" fill="#60a5fa" opacity="0.3"/>
+          </g>
+
+          <!-- 当前台风眼（带旋转动画）-->
+          <g id="typhoon-eye" transform="translate(340, 460)">
+            <g class="typhoon-spin">
+              <path d="M-18 0 Q-18 -18 0 -18 Q-9 -14 -9 -6 Q-14 -6 -14 4" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.9"/>
+              <path d="M18 0 Q18 18 0 18 Q9 14 9 6 Q14 6 14 -4" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.9"/>
+            </g>
+            <circle r="4" fill="white"/>
+          </g>
+
+          <!-- 地标 -->
+          <g fill="white" font-size="9" opacity="0.6">
+            <text x="80" y="175">上海</text>
+            <text x="140" y="245">杭州</text>
+            <text x="230" y="330">台北</text>
+            <text x="60" y="265">福州</text>
+            <text x="290" y="440">马尼拉</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 时间轴 -->
+      <div class="typhoon-timeline">
+        <div class="tt-label">
+          <span id="tt-time">04-24 14:00（现在）</span>
+          <span class="tt-force" id="tt-force">强台风 · 14 级</span>
+        </div>
+        <input type="range" id="tt-slider" class="tt-slider" min="0" max="5" value="0">
+        <div class="tt-ticks">
+          <span>现在</span>
+          <span>+12h</span>
+          <span>+24h</span>
+          <span>+36h</span>
+          <span>+48h</span>
+          <span>+60h</span>
+        </div>
+      </div>
+
+      <!-- 当前状态卡 -->
+      <div class="typhoon-stats" id="typhoon-stats">
+        <div class="ts-item">
+          <div class="ts-label">风速</div>
+          <div class="ts-val" id="ts-speed">48 m/s</div>
+        </div>
+        <div class="ts-item">
+          <div class="ts-label">中心气压</div>
+          <div class="ts-val" id="ts-pressure">935 hPa</div>
+        </div>
+        <div class="ts-item">
+          <div class="ts-label">移动</div>
+          <div class="ts-val" id="ts-direction">西北 25km/h</div>
+        </div>
+      </div>
+
+      <div class="typhoon-insight" id="typhoon-insight">
+        💡 拖动时间轴，Agent 会告诉你台风在该时刻最可能影响谁
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 场景：多人辩论厅（LIVE）============ -->
+  <div class="scene scene-debate" data-scene="debate">
+    <div class="immersive-top dark">
+      <button class="imm-back" data-back="agent">‹ 返回</button>
+      <div class="imm-title">
+        <div class="imm-type" style="color:#fff">🗣 辩论厅</div>
+        <div class="imm-sub" style="color:#ff5050">● LIVE · 2,341 人在场</div>
+      </div>
+      <button class="imm-remix" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">🎤 发言</button>
+    </div>
+
+    <div class="debate-stage">
+      <!-- 辩题 -->
+      <div class="debate-topic">
+        <div class="dt-label">🔥 今日辩题</div>
+        <div class="dt-question">美以伊冲突还会打多久？</div>
+        <div class="dt-sub">基于《伊朗硝烟中的美以裂痕》报道 · 4,200 字长文</div>
+      </div>
+
+      <!-- 立场分布（三方）-->
+      <div class="debate-sides">
+        <div class="ds-bar">
+          <div class="ds-fill ds-a" style="width: 38%"><span>38%</span></div>
+          <div class="ds-fill ds-b" style="width: 45%"><span>45%</span></div>
+          <div class="ds-fill ds-c" style="width: 17%"><span>17%</span></div>
+        </div>
+        <div class="ds-legend">
+          <div class="ds-legend-item"><span class="dot ds-dot-a"></span>立即停火（912 人）</div>
+          <div class="ds-legend-item"><span class="dot ds-dot-b"></span>还要打半年以上（1,053 人）</div>
+          <div class="ds-legend-item"><span class="dot ds-dot-c"></span>难说（376 人）</div>
+        </div>
+      </div>
+
+      <!-- 实时发言流 -->
+      <div class="debate-label">🎙 正在发言</div>
+      <div class="debate-stream" id="debate-stream">
+        <div class="debate-msg side-a">
+          <div class="dm-avatar" style="background:#3b82f6">张</div>
+          <div class="dm-body">
+            <div class="dm-head"><strong>张-国际观察</strong><span class="dm-side">立即停火派</span><span class="dm-time">刚刚</span></div>
+            <div class="dm-text">共和党内部已经开始动摇。油价 $135 是他们的红线。再打下去中期选举会翻车。</div>
+            <div class="dm-actions">
+              <button>👍 342</button>
+              <button>💬 回应</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="debate-msg side-b">
+          <div class="dm-avatar" style="background:#ef4444">Li</div>
+          <div class="dm-body">
+            <div class="dm-head"><strong>Liang · 中东研究</strong><span class="dm-side b">长期派</span><span class="dm-time">30 秒前</span></div>
+            <div class="dm-text">以色列的"核威胁红线"理由其实是个政治筹码。真正的底牌是德黑兰政权更迭。这种战略目标不可能三个月达成。</div>
+            <div class="dm-actions">
+              <button>👍 589</button>
+              <button>💬 回应</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="debate-msg side-c">
+          <div class="dm-avatar" style="background:#8b5cf6">M</div>
+          <div class="dm-body">
+            <div class="dm-head"><strong>Mei · 普通读者</strong><span class="dm-side c">难说派</span><span class="dm-time">1 分钟前</span></div>
+            <div class="dm-text">我更关心油价会涨到多少，对我的通勤成本有多大影响。谁能给我算算？</div>
+            <div class="dm-actions">
+              <button>👍 128</button>
+              <button>💬 回应</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="debate-msg side-a">
+          <div class="dm-avatar agent" style="background:linear-gradient(135deg,#0084ff,#0063c0)">🤖</div>
+          <div class="dm-body">
+            <div class="dm-head"><strong>Agent · 帮你汇总</strong><span class="dm-side agent">AI 主持</span><span class="dm-time">实时</span></div>
+            <div class="dm-text">三个派别的关键分歧点：① 对特朗普的约束力（共和党 vs 以色列游说）② 战略目标（停火 vs 政权更迭）③ 时间窗口（选举日历 vs 军事节奏）。<br><strong>所有立场都成立，取决于你相信哪层约束力更强。</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部输入 -->
+      <div class="debate-input">
+        <button class="di-side-btn side-a-btn">支持立即停火</button>
+        <button class="di-side-btn side-b-btn">支持长期派</button>
+        <button class="di-side-btn side-c-btn">难说</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 底部 Tab（全局，Agent 居中凸起）============ -->
+  <div class="bottom-tab-v2" id="bottom-tab">
+    <div class="tab-v2" data-tab="home" onclick="switchScene('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2V11z"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab-v2" data-tab="video" onclick="triggerToast('本 Demo 未实现')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+      <span>视频</span>
+    </div>
+
+    <!-- 中间凸起的 Agent 按钮 -->
+    <div class="tab-agent" data-tab="agent" onclick="switchScene('agent')">
+      <div class="tab-agent-halo"></div>
+      <div class="tab-agent-core">
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="white">
+          <rect x="7" y="9" width="18" height="16" rx="6"/>
+          <circle cx="12" cy="16" r="1.8" fill="#0084ff"/>
+          <circle cx="20" cy="16" r="1.8" fill="#0084ff"/>
+          <path d="M13 20q3 1.5 6 0" stroke="#0084ff" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          <path d="M16 9v-3M14 6h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="tab-v2" data-tab="follow" onclick="triggerToast('本 Demo 未实现')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+      <span>关注</span>
+    </div>
+    <div class="tab-v2" data-tab="me" onclick="triggerToast('本 Demo 未实现')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Remix 加载动画 -->
+  <div id="remix-loading" class="remix-loading">
+    <div class="rl-content">
+      <div class="rl-pulse"></div>
+      <div class="rl-text" id="rl-text">正在解析…</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

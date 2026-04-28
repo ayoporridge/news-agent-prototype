@@ -1,0 +1,108 @@
+/* ========== V5b（v7 重写）：图文卡回归"全图 + 蒙版 + 白色文字" ========== */
+
+/* 图文卡：底图铺满整屏 */
+.ifeed-article .ifeed-bg { inset: 0 !important; }
+
+/* 蒙版：上下都做遮罩，中间清晰露出图片 */
+.ifeed-article .ifeed-bg-gradient {
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.18) 22%,
+    rgba(0,0,0,0.08) 45%,
+    rgba(0,0,0,0.55) 78%,
+    rgba(0,0,0,0.85) 100%) !important;
+}
+
+/* 正文区（标题 + chip + 摘要）全部绝对定位到底部，文字白色带阴影 */
+.ifeed-article .ifeed-article-content {
+  position: absolute !important;
+  top: auto !important;
+  left: 20px !important;
+  right: 20px !important;
+  bottom: 120px !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 3;
+}
+
+.ifeed-article .ifeed-chip {
+  align-self: flex-start;
+  margin-bottom: 10px;
+  /* 保持原chip样式即可，chip本来就有背景 */
+}
+
+.ifeed-article .ifeed-headline {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  line-height: 1.3 !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    0 1px 2px rgba(0,0,0,0.7);
+}
+
+.ifeed-article .ifeed-excerpt {
+  position: static !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.ifeed-article .ifeed-excerpt p {
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  color: rgba(255,255,255,0.92) !important;
+  margin: 0 0 6px !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ifeed-article .ifeed-excerpt p:nth-of-type(n+2) {
+  display: none; /* 只显示一段，视觉上更干净 */
+}
+.ifeed-article .ifeed-excerpt strong {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* "阅读原文" 按钮：底部居左小按钮 */
+.ifeed-article .ifeed-fade-cta {
+  position: absolute !important;
+  left: 20px !important;
+  right: auto !important;
+  bottom: 80px !important;
+  height: auto !important;
+  width: auto !important;
+  z-index: 4;
+  pointer-events: auto !important;
+  border-radius: 99px !important;
+  overflow: visible !important;
+  display: inline-flex;
+  align-items: center;
+}
+.ifeed-article .ifeed-fade-gradient {
+  display: none !important;
+}
+.ifeed-article .ifeed-read-btn {
+  background: rgba(255,255,255,0.95) !important;
+  color: #0d1421 !important;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 99px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
+  border: 0 !important;
+}

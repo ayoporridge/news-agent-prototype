@@ -1,0 +1,280 @@
+/* =====================================================
+   V6：悬浮药丸式底 Tab + 首页热点清单 + 首页一图读懂入口
+   ===================================================== */
+
+/* ========== 1. 悬浮药丸式底 Tab ========== */
+.bottom-tab-v2 {
+  position: absolute !important;
+  bottom: 14px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;           /* 约屏幕 4/5 宽 */
+  height: 56px !important;
+  padding: 0 6px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 32px !important;
+  box-shadow:
+    0 10px 32px rgba(13, 20, 33, 0.12),
+    0 2px 8px rgba(13, 20, 33, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  justify-content: space-around !important;
+  align-items: center !important;
+  padding-top: 0 !important;
+  z-index: 500;
+}
+
+/* 暗色场景（视频/漫画/台风）下的 tab，保持浅色玻璃质感即可，不用改 */
+
+/* 普通 Tab 项：缩小字号、去掉 label，只显示 icon */
+.tab-v2 {
+  flex: 1 !important;
+  height: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  color: rgba(13, 20, 33, 0.55) !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  transition: color 0.2s;
+}
+.tab-v2 svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+.tab-v2.active {
+  color: var(--brand) !important;
+}
+.tab-v2 span {
+  font-size: 10px !important;
+  letter-spacing: 0;
+}
+
+/* 中间 Agent 按钮：保留凸起，但整体缩小 */
+.tab-agent {
+  width: 54px !important;
+  height: 54px !important;
+  margin-top: -26px !important;
+}
+.tab-agent-core svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+.tab-agent-halo {
+  inset: -4px !important;
+}
+
+/* 底 Tab 外部留出安全空间 */
+.scene {
+  padding-bottom: 0 !important;  /* 避免和悬浮 tab 冲突 */
+}
+
+
+/* ========== 2. 首屏底部 1/4 处：热点资讯小清单 ========== */
+.hot-strip {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 94px;  /* 在悬浮 Tab 上方、作者栏上方 */
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.7);
+  border-radius: 20px;
+  padding: 12px 14px 10px;
+  box-shadow:
+    0 10px 28px rgba(13, 20, 33, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.hs-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.hs-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d1421;
+  letter-spacing: 0.3px;
+}
+.hs-more {
+  font-size: 11px;
+  color: #8892a6;
+  cursor: pointer;
+}
+
+.hs-list {
+  display: flex;
+  flex-direction: column;
+}
+.hs-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 12.5px;
+  color: #1f2937;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.hs-item:not(:last-child) {
+  border-bottom: 0.5px solid rgba(13, 20, 33, 0.05);
+}
+.hs-rank {
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: 'Inter', sans-serif;
+}
+.hs-rank-1 { color: #ef4444; }
+.hs-rank-2 { color: #f59e0b; }
+.hs-rank-3 { color: #fbbf24; }
+.hs-rank:not(.hs-rank-1):not(.hs-rank-2):not(.hs-rank-3) { color: #8892a6; }
+
+.hs-txt {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.hs-hot {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* 为了让图文第一屏的作者栏位置避让热点清单 */
+.ifeed-article .ifeed-bottom {
+  bottom: 10px !important;
+}
+
+/* 第一屏（image2 卡）：用热点清单替代 CTA 与作者栏（简化视觉） */
+.ifeed-item[data-feed-index="0"] .ifeed-fade-cta {
+  display: none !important;
+}
+.ifeed-item[data-feed-index="0"] .ifeed-bottom {
+  /* 作者栏下移融入热点清单上方，紧凑化 */
+  bottom: 218px !important;
+  padding: 0 16px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifeed-author {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifa-avatar {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 11px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifa-name {
+  font-size: 12px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifa-meta {
+  font-size: 10.5px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifeed-article-content {
+  bottom: 260px !important;
+}
+.ifeed-item[data-feed-index="0"] .ifeed-right-rail {
+  bottom: 260px !important;
+}
+/* 其他图文/视频卡：右侧栏下移靠近底部 */
+.ifeed-article:not([data-feed-index="0"]) .ifeed-right-rail {
+  bottom: 90px !important;
+}
+.ifeed-video .ifeed-right-rail {
+  bottom: 170px !important;
+}
+
+
+/* ========== 3. 首页图文卡「一图读懂」植入入口 ========== */
+.ifeed-dongdu-entry {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 170px;  /* 在 "阅读原文" CTA 的正上方 */
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  background: linear-gradient(135deg, rgba(139, 37, 37, 0.95), rgba(74, 26, 26, 0.95));
+  backdrop-filter: blur(10px);
+  border: 0.5px solid rgba(251, 191, 36, 0.35);
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(74, 26, 26, 0.35);
+  transition: transform 0.15s;
+}
+.ifeed-dongdu-entry:active {
+  transform: scale(0.98);
+}
+
+.ide-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 10px;
+  font-size: 18px;
+}
+.ide-body {
+  flex: 1;
+  min-width: 0;
+}
+.ide-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff3d6;
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.ide-sub {
+  font-size: 11px;
+  color: rgba(255, 243, 214, 0.65);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ide-arrow {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: #fbbf24;
+  font-weight: 300;
+}
+
+/* 美以裂痕卡的图文内容区需要避让 dongdu 入口和热点清单 */
+.ifeed-manga-entry .ifeed-article-content {
+  padding-bottom: 16px;
+}
+.ifeed-manga-entry .ifeed-bottom {
+  bottom: 10px !important;
+}
+
+
+/* ========== 4. 视频/暗色场景下底 Tab 玻璃质感不变（已是浅色玻璃） ========== */
+/* 保证在黑色背景下仍然可见 */
