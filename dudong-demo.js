@@ -86,7 +86,7 @@ const drawerContent = {
       </div>
       <div class="trust-card">
         <div class="source-row">
-          <div><strong>原始报道</strong><span>腾讯新闻转载澎湃新闻，发布于 2026 年 4 月 23 日 11:56。</span></div>
+          <div><strong>原始报道</strong><span>NEWS转载澎湃新闻，发布于 2026 年 4 月 23 日 11:56。</span></div>
           <span class="badge">已核对</span>
         </div>
         <div class="source-row">
@@ -125,7 +125,7 @@ const drawerContent = {
       <div class="ad-card">
         <div class="ad-label">合作专题 · 标注广告</div>
         <div class="ad-title">AI 图片与证件安全专题</div>
-        <div class="ad-desc">由腾讯安全支持。专题会介绍如何识别 AI 生成图、保护身份证照片、避免人脸伪造和社交截图诈骗。内容经腾讯新闻科技编辑审核。</div>
+        <div class="ad-desc">由腾讯安全支持。专题会介绍如何识别 AI 生成图、保护身份证照片、避免人脸伪造和社交截图诈骗。内容经NEWS科技编辑审核。</div>
         <div class="ad-actions">
           <button class="mini-btn" onclick="showToast('打开合作专题')">查看专题</button>
           <button class="mini-btn" onclick="showToast('为什么推荐：与本文主题相关')">为什么出现</button>
